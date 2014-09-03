@@ -451,7 +451,7 @@
                             target.getAttribute('data-pika-day')
                         );
                     // Preserve time selection when date changed
-                    if (self._d && opts.showTime) {
+                    if (opts.showTime) {
                         if (self._d) {
                     		newDate.setHours(self._d.getHours());
                         	newDate.setMinutes(self._d.getMinutes());
