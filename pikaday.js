@@ -129,6 +129,16 @@
         return a.getTime() === b.getTime();
     },
 
+    isDisabledDate = function(range,day)
+    {
+        for (var i = 0; i < range.length; i++) {
+            if (range[i] == day) {
+                    return true;
+            }
+        }
+        return false;
+    },
+
     extend = function(to, from, overwrite)
     {
         var prop, hasProp;
@@ -200,6 +210,9 @@
         minDate: null,
         // the maximum/latest date that can be selected
         maxDate: null,
+
+        // array of disabled dates
+        disabledDates: null,
 
         // number of years either side, or array of upper/lower range
         yearRange: 10,
@@ -923,7 +936,7 @@
             for (var i = 0, r = 0; i < cells; i++)
             {
                 var day = new Date(year, month, 1 + (i - before)),
-                    isDisabled = (opts.minDate && day < opts.minDate) || (opts.maxDate && day > opts.maxDate),
+                    isDisabled = (opts.minDate && day < opts.minDate) || (opts.maxDate && day > opts.maxDate) || (opts.disabledDates && isDisabledDate(opts.disabledDates,day)),
                     isSelected = isDate(this._d) ? compareDates(day, this._d) : false,
                     isToday = compareDates(day, now),
                     isEmpty = i < before || i >= (days + before);
