@@ -261,7 +261,7 @@
         numberOfMonths: 1,
 
         // time
-        showTime: true,
+        showTime: false,
         showSeconds: false,
         use24hour: false,
         defaultHours:0,
