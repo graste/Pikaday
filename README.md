@@ -118,6 +118,10 @@ Pikaday has many useful options:
 * `clearInvalidInput` clear the input field (if `field` is set) on invalid input (default `false`)
 * `disableInput` disable user input to the datepicker (defauls to false)
 * `showDaysInNextAndPreviousMonths` render days of the calendar grid that fall in the next or previous months to the current month instead of rendering an empty table cell (default: false)
+* `events` array of dates that you would like to differentiate from regular days – choose one of the two forms:
+  * 'Sat Jun 28 2014' or
+  * { date: new Date('Sat Jun 28 2014'), css: 'is-holiday is-special', title: 'some title' }
+  * (e.g. `['Sat Jun 28 2014', 'Sun Jun 29 2014', 'Tue Jul 01 2014',]`)
 * `onSelect` callback function for when a date is selected
 * `onClear` callback function for when date is set to null or invalid date
 * `onOpen` callback function for when the picker becomes visible
@@ -248,6 +252,18 @@ Update the minimum/earliest date that can be selected.
 `picker.setMaxDate()`
 
 Update the maximum/latest date that can be selected.
+
+`picker.addEvents()`
+
+Add an event to show (choose between the date.ToStringDate() form and the {date: date, backgroundColor: background-color, color: color} form).
+
+`picker.removeEvents()`
+
+Remove an event (need a date.ToStringDate() form).
+
+`picker.getEvents()`
+
+Return the list of all the saved events as they were saved.
 
 ### Show and hide datepicker
 
