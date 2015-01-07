@@ -1053,9 +1053,10 @@
                 maxYear = opts.maxYear,
                 minMonth = opts.minMonth,
                 maxMonth = opts.maxMonth,
-                html = '';
+                html = '',
+                i = 0;
 
-            for (i = 0; i < this.calendars.length; i++) { 
+            for (i = 0; i < this.calendars.length; i++) {
 
                 if (this.calendars[i].year <= minYear) {
                     this.calendars[i].year = minYear;
