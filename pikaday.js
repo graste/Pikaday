@@ -102,6 +102,11 @@
         return (/Array/).test(Object.prototype.toString.call(obj));
     },
 
+    makeArray = function(obj)
+    {
+        return obj === undefined ? [] : isArray(obj) ? obj : [obj];
+    },
+
     isDate = function(obj)
     {
         return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime());
@@ -188,14 +193,12 @@
         // automatically fit in the viewport even if it means repositioning from the position option
         reposition: true,
 
-        // the default output format for `.toString()` and `field` value
-        // set in `config` based on if showTime is set
-        format: null,
+        // the default output format for `.toString()` and `field` value (Moment.js required)
+        format: 'YYYY-MM-DD',
 
-        // an array giving the allowable input format(s).  As with moment,
-        // the input formats may be either a single string or an array of strings.
-        // Usually set in `config`
-        inputFormats: null,
+        // optional array of allowed input formats for `field` value and `.setDate()` with string (Moment.js required)
+        // the default output `format` will be added to `inputFormats` if not already included
+        inputFormats: [],
 
         // the initial date to view when first opened
         defaultDate: null,
@@ -223,12 +226,13 @@
         minMonth: undefined,
         maxMonth: undefined,
 
+        // reverse the calendar for right-to-left languages
         isRTL: false,
 
-        // Additional text to append to the year in the calendar title
+        // additional text to append to the year in the calendar title
         yearSuffix: '',
 
-        // Render the month after year in the calendar title
+        // render the month after year in the calendar title
         showMonthAfterYear: false,
 
         // how many months are visible
@@ -246,6 +250,9 @@
         // Specify a DOM element to render the calendar in
         container: undefined,
 
+        // clear the input field (if `field` is set) on invalid input
+        clearInvalidInput: false,
+
         // internationalization
         i18n: {
             previousMonth : 'Previous Month',
@@ -257,8 +264,9 @@
             noon          : 'Noon'
         },
 
-        // callback function
+        // callback functions
         onSelect: null,
+        onClear: null,
         onOpen: null,
         onClose: null,
         onDraw: null
@@ -518,19 +526,12 @@
 
         self._onInputChange = function(e)
         {
-            var date;
-
             if (e.firedBy === self) {
                 return;
             }
-            if (hasMoment) {
-                date = moment(opts.field.value, opts.inputFormats);
-                date = (date && date.isValid()) ? date.toDate() : null;
-            }
-            else {
-                date = new Date(Date.parse(opts.field.value));
-            }
-            self.setDate(isDate(date) ? date : null);
+
+            self.setDate(opts.field.value);
+
             if (!self._v) {
                 self.show();
             }
@@ -597,12 +598,8 @@
             }
             addEvent(opts.field, 'change', self._onInputChange);
 
-            if (!opts.defaultDate) {
-                if (hasMoment && opts.field.value) {
-                    opts.defaultDate = moment(opts.field.value, opts.inputFormats).toDate();
-                } else {
-                    opts.defaultDate = new Date(Date.parse(opts.field.value));
-                }
+            if (!opts.defaultDate && opts.field.value) {
+                opts.defaultDate = self.parseDate(opts.field.value);
                 opts.setDefaultDate = true;
             }
         }
@@ -655,6 +652,8 @@
             opts.bound = !!(opts.bound !== undefined ? opts.field && opts.bound : opts.field);
 
             opts.trigger = (opts.trigger && opts.trigger.nodeName) ? opts.trigger : opts.field;
+
+            opts.inputFormats = !opts.inputFormats ? opts.format : makeArray(opts.inputFormats).concat(opts.format);
 
             var nom = parseInt(opts.numberOfMonths, 10) || 1;
             opts.numberOfMonths = nom > 4 ? 4 : nom;
@@ -710,7 +709,37 @@
          */
         toString: function(format)
         {
-            return !isDate(this._d) ? '' : hasMoment ? moment(this._d).format(format || this._o.format) : this._o.showTime ? this._d.toString() : this._d.toDateString();
+            if (!isDate(this._d)) {
+                return '';
+            }
+
+            if (hasMoment) {
+                return moment(this._d).format(format || this._o.format);
+            }
+
+            if (this._o.showTime) {
+                return this._d.toString();
+            }
+
+            return this._d.toDateString();
+        },
+
+        /**
+         * return a Date parsed from the given string (using Moment.js if available)
+         */
+        parseDate: function(str, format)
+        {
+            var date;
+
+            if (hasMoment) {
+                date = moment(str, format || this._o.inputFormats);
+                date = date.isValid() ? date.toDate() : null;
+            } else {
+                date = Date.parse(str);
+                date = date != null && !isNaN(date) ? new Date(date) : null;
+            }
+
+            return date;
         },
 
         /**
@@ -775,11 +804,13 @@
 
                 return this.draw();
             }
+
             if (typeof date === 'string') {
-                date = new Date(Date.parse(date));
+                date = this.parseDate(date);
             }
+
             if (!isDate(date)) {
-                return;
+                return this.clearDate(this._o.clearInvalidInput, preventOnSelect);
             }
 
             var min = this._o.minDate,
@@ -807,6 +838,24 @@
             }
             if (!preventOnSelect && typeof this._o.onSelect === 'function') {
                 this._o.onSelect.call(this, this.getDate());
+            }
+        },
+
+        /**
+         * clear the current selection
+         */
+        clearDate: function(clearField, preventOnClear)
+        {
+            this._d = null;
+            this.draw();
+
+            if (clearField && this._o.field) {
+                this._o.field.value = '';
+                fireEvent(this._o.field, 'change', { firedBy: this });
+            }
+
+            if (!preventOnClear && typeof this._o.onClear === 'function') {
+                this._o.onClear.call(this);
             }
         },
 
@@ -928,17 +977,17 @@
                 maxMonth = opts.maxMonth,
                 html = '';
 
-            if (this._y <= minYear) {
+            if (this._y < minYear) {
                 this._y = minYear;
-                if (!isNaN(minMonth) && this._m < minMonth) {
-                    this._m = minMonth;
-                }
+                this._m = minMonth;
+            } else if (this._y == minYear && !isNaN(minMonth) && this._m < minMonth) {
+                this._m = minMonth;
             }
-            if (this._y >= maxYear) {
+            if (this._y > maxYear) {
                 this._y = maxYear;
-                if (!isNaN(maxMonth) && this._m > maxMonth) {
-                    this._m = maxMonth;
-                }
+                this._m = maxMonth;
+            } else if (this._y == maxYear && !isNaN(maxMonth) && this._m > maxMonth) {
+                this._m = maxMonth;
             }
 
             for (var c = 0; c < opts.numberOfMonths; c++) {
