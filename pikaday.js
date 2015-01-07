@@ -549,7 +549,7 @@
 
             self.setDate(opts.field.value);
 
-            if (!self._v) {
+            if (!self._v && opts.bound) {
                 self.show();
             }
         };
