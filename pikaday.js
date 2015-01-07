@@ -144,6 +144,16 @@
         return _a.getTime() === _b.getTime();
     },
 
+    isDisabledDate = function(range,day)
+    {
+        for (var i = 0; i < range.length; i++) {
+            if (range[i] === day) {
+                    return true;
+            }
+        }
+        return false;
+    },
+
     extend = function(to, from, overwrite)
     {
         var prop, hasProp;
@@ -222,6 +232,9 @@
         minDate: null,
         // the maximum/latest date that can be selected
         maxDate: null,
+
+        // array of disabled dates
+        disabledDates: null,
 
         // number of years either side, or array of upper/lower range
         yearRange: 10,
@@ -1164,6 +1177,7 @@
                     isEmpty = i < before || i >= (days + before),
                     isDisabled = (opts.minDate && day < opts.minDate) ||
                                  (opts.maxDate && day > opts.maxDate) ||
+                                 (opts.disabledDates && isDisabledDate(opts.disabledDates, day)) ||
                                  (opts.disableWeekends && isWeekend(day)) ||
                                  (opts.disableDayFn && opts.disableDayFn(day));
 
