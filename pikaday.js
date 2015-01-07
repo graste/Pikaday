@@ -149,7 +149,7 @@
         var prop, hasProp;
         for (prop in from) {
             hasProp = to[prop] !== undefined;
-            if (hasProp && typeof from[prop] === 'object' && from[prop] != null && from[prop].nodeName === undefined) {
+            if (hasProp && typeof from[prop] === 'object' && from[prop] !== null && from[prop].nodeName === undefined) {
                 if (isDate(from[prop])) {
                     if (overwrite) {
                         to[prop] = new Date(from[prop].getTime());
@@ -440,11 +440,11 @@
                 }
             }) +
             '<td>:</td>' +
-            renderTimePicker(60, mm, 'pika-select-minute', function(i) { if (i < 10) return "0" + i; return i });
+            renderTimePicker(60, mm, 'pika-select-minute', function(i) { if (i < 10) return '0' + i; return i });
 
         if (opts.showSeconds) {
             to_return += '<td>:</td>' +
-                renderTimePicker(60, ss, 'pika-select-second', function(i) { if (i < 10) return "0" + i; return i });
+                renderTimePicker(60, ss, 'pika-select-second', function(i) { if (i < 10) return '0' + i; return i });
         }
         return to_return + '</tr></tbody></table>';
     },
@@ -766,7 +766,7 @@
                 date = date.isValid() ? date.toDate() : null;
             } else {
                 date = Date.parse(str);
-                date = date != null && !isNaN(date) ? new Date(date) : null;
+                date = date !== null && !isNaN(date) ? new Date(date) : null;
             }
 
             return date;
@@ -812,13 +812,13 @@
                 		0);
             }
             if (hours) {
-                this._d.setHours(hours == null ? this._o.defaultHours : hours);
+                this._d.setHours(hours === null ? this._o.defaultHours : hours);
             }
             if (minutes) {
-                this._d.setMinutes(minutes == null ? this._o.defaultMinutes : minutes);
+                this._d.setMinutes(minutes === null ? this._o.defaultMinutes : minutes);
             }
             if (seconds) {
-                this._d.setSeconds(seconds == null ? this._o.defaultSeconds : seconds);
+                this._d.setSeconds(seconds === null ? this._o.defaultSeconds : seconds);
             }
             this.setDate(this._d);
         },
@@ -1014,13 +1014,13 @@
             if (this._y < minYear) {
                 this._y = minYear;
                 this._m = minMonth;
-            } else if (this._y == minYear && !isNaN(minMonth) && this._m < minMonth) {
+            } else if (this._y === minYear && !isNaN(minMonth) && this._m < minMonth) {
                 this._m = minMonth;
             }
             if (this._y > maxYear) {
                 this._y = maxYear;
                 this._m = maxMonth;
-            } else if (this._y == maxYear && !isNaN(maxMonth) && this._m > maxMonth) {
+            } else if (this._y === maxYear && !isNaN(maxMonth) && this._m > maxMonth) {
                 this._m = maxMonth;
             }
 
