@@ -336,8 +336,8 @@
         }
         if (hasEvent) {
             arr.push('has-event');
-            arr.push(eventObject.css || '');
-            title = eventObject.title || '';
+            arr.push(eventObject.css);
+            title = eventObject.title;
         }
         return '<td data-day="' + d + '" class="' + arr.join(' ') + '">' +
                  '<button class="pika-button pika-day" type="button" title="' + title + '"' +
@@ -666,7 +666,7 @@
         opts.events.isDateIn = function (d) {
             if (typeof opts.events[0] === 'object') {
                 for (var i = 0; i < opts.events.length; i++) {
-                    if (opts.events[i].date.toDateString() == d.toDateString())
+                    if (opts.events[i].date.toDateString() === d.toDateString())
                         return true;
                 }
             }
@@ -679,7 +679,7 @@
         opts.events.indexOfDate = function (d) {
             if (typeof opts.events[0] === 'object') {
                 for (var i = 0; i < opts.events.length; i++) {
-                    if (opts.events[i].date.toDateString() == d.toDateString())
+                    if (opts.events[i].date.toDateString() === d.toDateString())
                         return i;
                 }
             }
@@ -833,15 +833,15 @@
         * add a date to the Events list
         */
         addEvents: function (o) {
-            if (typeof o === 'object' && o != null) {
+            if (typeof o === 'object' && o !== null) {
                 if (!this._o.events.isDateIn(o.date))
-                    this._o.events.push({ date: o.date, color: o.color, backgroundColor: o.backgroundColor });
+                    this._o.events.push({ date: o.date, css: o.css || '', title: o.title || '' });
                 else {
-                    this._o.events[this._o.events.indexOfDate(o.date)].color = o.color;
-                    this._o.events[this._o.events.indexOfDate(o.date)].backgroundColor = o.backgroundColor;
+                    this._o.events[this._o.events.indexOfDate(o.date)].css = '';
+                    this._o.events[this._o.events.indexOfDate(o.date)].title = '';
                 }
             }
-            else if (this._o.events.indexOf(o) == -1)
+            else if (this._o.events.indexOf(o) === -1)
                 this._o.events.push(o);
             this.draw(true);
         },
