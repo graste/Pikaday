@@ -766,7 +766,6 @@
                 }
             }
 
-<<<<<<< HEAD
             // If no format is given, set based on showTime
             if (opts.format === null) {
                 opts.format = 'YYYY-MM-DD';
@@ -779,11 +778,8 @@
                 opts.inputFormats = opts.format;
             }
 
-||||||| merged common ancestors
-=======
             opts.events = opts.events || [];
 
->>>>>>> Zykino/Events-to-show-some-dates-in-color
             return opts;
         },
 
