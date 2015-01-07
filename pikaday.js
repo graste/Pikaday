@@ -1197,6 +1197,8 @@
                 }
             }
 
+            this.el.classList.remove('is-above');
+
             // default position is bottom & left
             if ((this._o.reposition && left + width > viewportWidth) ||
                 (
@@ -1213,6 +1215,7 @@
                 )
             ) {
                 top = top - height - field.offsetHeight;
+                this.el.classList.add('is-above');
             }
 
             this.el.style.cssText = [
