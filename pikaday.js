@@ -871,7 +871,7 @@
                 fireEvent(this._o.field, 'change', { firedBy: this });
             }
             if (!preventOnSelect && typeof this._o.onSelect === 'function') {
-                this._o.onSelect.call(this, this.getDate());
+                this._o.onSelect.call(this, this.getDate(), this);
             }
         },
 
