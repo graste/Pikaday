@@ -206,6 +206,9 @@
         // the default output `format` will be added to `inputFormats` if not already included
         inputFormats: [],
 
+        // if true, when using moment JS the entered date must exactly match the format
+        strictParsing: false,
+
         // the initial date to view when first opened
         defaultDate: null,
 
@@ -762,7 +765,7 @@
             var date;
 
             if (hasMoment) {
-                date = moment(str, format || this._o.inputFormats);
+                date = moment(str, format || this._o.inputFormats, this._o.strictParsing);
                 date = date.isValid() ? date.toDate() : null;
             } else {
                 date = Date.parse(str);
@@ -980,20 +983,47 @@
             }
         },
 
+        
         /**
          * change the minDate
          */
-        setMinDate: function(value)
+        setMinDate: function (value) 
         {
-            this._o.minDate = value;
+            var opts = this._o;
+
+            setToStartOfDay(value);
+            
+            opts.minDate = value;
+
+            if (opts.minDate) {
+                opts.minYear = opts.minDate.getFullYear();
+                opts.minMonth = opts.minDate.getMonth();
+            }
+            else {
+                opts.minYear = undefined;
+                opts.minMonth = undefined;
+            }
         },
 
         /**
          * change the maxDate
          */
-        setMaxDate: function(value)
+        setMaxDate: function (value)
         {
-            this._o.maxDate = value;
+            var opts = this._o;
+
+            setToStartOfDay(value);
+
+            opts.maxDate = value;
+            
+            if (opts.maxDate) {
+                opts.maxYear = opts.maxDate.getFullYear();
+                opts.maxMonth = opts.maxDate.getMonth();
+            }
+            else {
+                opts.maxYear = undefined;
+                opts.maxMonth = undefined;
+            }
         },
 
         /**
