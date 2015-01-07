@@ -248,6 +248,9 @@
         showTime: true,
         showSeconds: false,
         use24hour: false,
+        defaultHours:0,
+        defaultMinutes:0,
+        defaultSeconds:0,
 
         // when numberOfMonths is used, this will help you to choose where the main calendar will be (default `left`, can be set to `right`)
         // only used for the first display or when a selected date is not visible
@@ -475,9 +478,14 @@
                             target.getAttribute('data-pika-day')
                         );
                     // Preserve time selection when date changed
-                    if (self._d && opts.showTime) {
-                        newDate.setHours(self._d.getHours());
-                        newDate.setMinutes(self._d.getMinutes());
+                    if (opts.showTime) {
+                        if (self._d) {
+                    		newDate.setHours(self._d.getHours());
+                        	newDate.setMinutes(self._d.getMinutes());
+                    	} else {
+                    		newDate.setHours(self._o.defaultHours);
+                        	newDate.setMinutes(self._o.defaultMinutes);
+                    	}
                     }
                     self.setDate(newDate);
                     if (opts.bound) {
@@ -797,16 +805,20 @@
         setTime: function(hours, minutes, seconds) {
             if (!this._d) {
                 this._d = new Date();
-                this._d.setHours(0,0,0,0);
+                this._d.setHours(
+                		this._o.defaultHours,
+                		this._o.defaultMinutes,
+                		this._o.defaultSeconds,
+                		0);
             }
             if (hours) {
-                this._d.setHours(hours);
+                this._d.setHours(hours == null ? this._o.defaultHours : hours);
             }
             if (minutes) {
-                this._d.setMinutes(minutes);
+                this._d.setMinutes(minutes == null ? this._o.defaultMinutes : minutes);
             }
             if (seconds) {
-                this._d.setSeconds(seconds);
+                this._d.setSeconds(seconds == null ? this._o.defaultSeconds : seconds);
             }
             this.setDate(this._d);
         },
@@ -1019,11 +1031,11 @@
             if (opts.showTime) {
                 html += '<div>' +
                         renderTime(
-                            this._d ? this._d.getHours() : 0,
-                            this._d ? this._d.getMinutes() : 0,
-                            this._d ? this._d.getSeconds() : 0,
-                            opts)
-                    + '</div>';
+                            this._d ? this._d.getHours() : opts.defaultHours,
+                            this._d ? this._d.getMinutes() : opts.defaultMinutes,
+                            this._d ? this._d.getSeconds() : opts.defaultSeconds,
+                            opts
+                        ) + '</div>';
             }
 
             this.el.innerHTML = html;
