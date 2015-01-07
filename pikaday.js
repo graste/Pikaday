@@ -491,14 +491,7 @@
                     	}
                     }
                     self.setDate(newDate);
-                    if (opts.bound) {
-                        sto(function() {
-                            self.hide();
-                            if (opts.field) {
-                                opts.field.blur();
-                            }
-                        }, 100);
-                    }
+                    self._c = true;
                     return;
                 }
                 else if (hasClass(target, 'pika-prev')) {
@@ -1059,7 +1052,7 @@
             }
 
             if (opts.showTime) {
-                html += '<div>' +
+                html += '<div class="pika-wrapper">' +
                         renderTime(
                             this._d ? this._d.getHours() : opts.defaultHours,
                             this._d ? this._d.getMinutes() : opts.defaultMinutes,
